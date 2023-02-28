@@ -1,0 +1,5 @@
+pymongo==4.3.2
+python-decouple==3.6
+Flask==2.2.2
+PyJWT==2.6.0
+bcrypt
