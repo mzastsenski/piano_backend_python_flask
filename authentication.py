@@ -7,7 +7,6 @@ import bcrypt
 import json
 import jwt
 from middleware import check_token
-
 PREFIX = "/api"
 uri = config('MONGO_URI')
 projection = {'_id': 0}
@@ -24,7 +23,8 @@ def login():
         checked = bcrypt.checkpw(user_pass.encode(), target_user["pass"].encode())
         if checked:
             time = datetime.now().timestamp()
-            token = jwt.encode({"name": user, "time": time}, 'secret', algorithm='HS256')
+            secret = config('ACCESS_TOKEN_SECRET')
+            token = jwt.encode({"name": user, "time": time}, secret, algorithm='HS256')
             response = make_response("200")
             response.set_cookie("token", token, httponly=True, max_age=7*24*3600)
             return response
@@ -44,7 +44,7 @@ def sign_up():
         return Response('401', status=401)
     else:
         pass_hash = bcrypt.hashpw(request.json['pass'].encode(), bcrypt.gensalt())
-        default_song = json.load(open('default_song.json'))
+        default_song = json.load(open('data/default_song.json'))
         users.insert_one({ "user": user, "pass": pass_hash.decode()})
         songs = client["piano"]["songs"]
         songs.insert_one({
